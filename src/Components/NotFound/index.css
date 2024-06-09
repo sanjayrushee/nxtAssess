@@ -1,0 +1,36 @@
+.pageNotFound-Container {
+  color: #475569;
+  font-family: 'Roboto';
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+.notFoundImage {
+  width: 210px;
+  height: 210px;
+}
+.notFoundHeading {
+  font-family: 'Roboto';
+  font-size: 18px;
+  font-weight: 500;
+}
+
+@media screen and (min-width: 769px) {
+  .notFoundImage {
+    width: 390px;
+    height: 390px;
+  }
+  .pageNotFound-Container {
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+  .notFoundHeading {
+    font-family: 'Roboto';
+    font-size: 21px;
+    font-weight: 500;
+  }
+}
