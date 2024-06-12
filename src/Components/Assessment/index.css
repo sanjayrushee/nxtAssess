@@ -127,16 +127,16 @@
 .option-Lists {
   display: flex;
   justify-content: flex-start;
+  align-items: center;
   width: 280px;
   height: 56px;
-  padding-left: 10px;
+  padding-left: 15px;
   border-radius: 8px;
   background-color: #ebf3ff;
   font-family: 'Inter';
   color: #334155;
   font-size: 16px;
   font-weight: 400;
-  text-align: left;
   border: 1px solid #ebf3ff;
 }
 .next-button-container {
@@ -179,6 +179,14 @@
 }
 .option-Lists-clicked {
   border: 2px solid #60a5fa;
+}
+
+.loader-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 @media screen and (min-width: 769px) {

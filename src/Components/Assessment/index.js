@@ -1,9 +1,8 @@
-import {Component, useEffect} from 'react'
-import {Route, Redirect, Link} from 'react-router-dom'
+import {Component} from 'react'
+import {Link} from 'react-router-dom'
 import Loader from 'react-loader-spinner'
 import Header from '../Header'
 import Results from '../Results'
-import ProductRoute from '../Route'
 import './index.css'
 
 const apiStatusConstants = {
@@ -22,10 +21,9 @@ class Assessment extends Component {
     oderOfQuestions: 0,
     AnswerQuestions: 0,
     correctAnswerCount: 0,
-    isTimerRunning: false,
-    isAssessmentFinished: false,
+    isTimerRunningEnd: false,
     timeINSecs: 0,
-    timerLimitInMinutes: 1,
+    timerLimitInMinutes: 10,
     disableClick: false,
   }
 
@@ -59,7 +57,7 @@ class Assessment extends Component {
       this.setState({
         timeINSecs: 0,
         timerLimitInMinutes: 0,
-        isTimerRunning: true,
+        isTimerRunningEnd: true,
       })
       console.log('time end')
     } else if (timeINSecs === 0 && timerLimitInMinutes !== 0) {
@@ -77,7 +75,11 @@ class Assessment extends Component {
     const stringifiedMinutes =
       timerLimitInMinutes > 9 ? timerLimitInMinutes : `0${timerLimitInMinutes}`
     const stringifiedSeconds = timeINSecs > 9 ? timeINSecs : `0${timeINSecs}`
-    return `00:${stringifiedMinutes}:${stringifiedSeconds}`
+    return (
+      <p className="timer-left-para">
+        00:{stringifiedMinutes}:{stringifiedSeconds}
+      </p>
+    )
   }
 
   // Result page
@@ -85,24 +87,19 @@ class Assessment extends Component {
     const {
       correctAnswerCount,
       timeINSecs,
-      isTimerRunning,
+      isTimerRunningEnd,
       timerLimitInMinutes,
     } = this.state
 
     return (
-      <ProductRoute
-        exact
-        path="/results"
-        render={props => (
-          <Results
-            {...props}
-            correctAnswerCount={correctAnswerCount}
-            timeINSecs={timeINSecs}
-            timerLimitInMinutes={timerLimitInMinutes}
-            isTimerRunning={isTimerRunning}
-          />
-        )}
-      />
+      <div>
+        <Results
+          correctAnswerCount={correctAnswerCount}
+          timeINSecs={timeINSecs}
+          timerLimitInMinutes={timerLimitInMinutes}
+          isTimerRunningEnd={isTimerRunningEnd}
+        />
+      </div>
     )
   }
 
@@ -170,8 +167,6 @@ class Assessment extends Component {
     } else if (questions.length === 1) {
       console.log('this line execute')
       clearInterval(this.timerId)
-      this.setState({isAssessmentFinished: true})
-      return
     }
 
     if (oderOfQuestions === total) {
@@ -193,7 +188,7 @@ class Assessment extends Component {
     }
     console.log('this line execute')
     clearInterval(this.timerId)
-    // return this.setState({isAssessmentFinished: true})
+    this.storeDataInLocalStorage()
   }
 
   ClickedOnQuestionNumber = event => {
@@ -231,7 +226,7 @@ class Assessment extends Component {
               onClick={this.onClickOption}
               id={option.isCorrect}
             >
-              <p>{option.text}</p>
+              {option.text}
             </li>
           </ul>
         ))
@@ -244,7 +239,7 @@ class Assessment extends Component {
               id={option.isCorrect}
               onClick={this.onClickOption}
             >
-              <p>{option.text}</p>
+              {option.text}
             </li>
           </ul>
         ))
@@ -278,9 +273,7 @@ class Assessment extends Component {
           <div className="sub-container-assessment">
             <div className="time-left-container">
               <p className="timer-left-para">Time Left</p>
-              <p className="timer-left-para">
-                {this.getElapsedSecondsInTimeFormat()}
-              </p>
+              {this.getElapsedSecondsInTimeFormat()}
             </div>
             <div className="count-of-questions-container">
               <p className="question-count-para">
@@ -306,7 +299,7 @@ class Assessment extends Component {
                   type="submit"
                   onClick={this.onSubmitQuestion}
                 >
-                  Submit Assessment{' '}
+                  Submit Assessment
                 </button>
               </Link>
             </div>
@@ -346,7 +339,7 @@ class Assessment extends Component {
     <div>
       <img
         src="https://res.cloudinary.com/dk37xrzzu/image/upload/v1717476993/nxtwave/somethingwentwrong_fupwxs.png"
-        alt="Something went Wrong"
+        alt="failure view"
         className="oops-image-ass"
       />
       <div>
@@ -359,11 +352,29 @@ class Assessment extends Component {
     </div>
   )
 
-  finalRender = () => {
-    const {apiStatus, isAssessmentFinished, isTimerRunning} = this.state
+  storeDataInLocalStorage = () => {
+    const {
+      correctAnswerCount,
+      timeINSecs,
+      isTimerRunningEnd,
+      timerLimitInMinutes,
+    } = this.state
+    const data = {
+      correctAnswerCount,
+      timeINSecs,
+      isTimerRunningEnd,
+      timerLimitInMinutes,
+    }
+    localStorage.setItem('quizResults', JSON.stringify(data))
+  }
 
-    if (isAssessmentFinished || isTimerRunning) {
-      return this.resultPage()
+  finalRender = () => {
+    const {apiStatus, isTimerRunningEnd} = this.state
+    const {history} = this.props
+    if (isTimerRunningEnd) {
+      history.push('/results')
+      this.setState({isTimerRunningEnd: true})
+      return this.onSubmitQuestion()
     }
 
     switch (apiStatus) {

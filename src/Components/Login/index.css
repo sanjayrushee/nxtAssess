@@ -59,6 +59,7 @@
 }
 
 .login-button {
+  cursor: pointer;
   font-family: Roboto;
   font-size: 14px;
   font-weight: 700;
